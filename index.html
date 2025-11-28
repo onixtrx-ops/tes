@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=390, initial-scale=1.0" />
+  <title>SeaDrop Mint – Far Whaleys</title>
+
+  <style>
+    :root {
+      --bg-main: #05030a;
+      --bg-card: #090318;
+      --accent: #a855ff;
+      --accent-2: #22d3ee;
+      --text-main: #f5e7ff;
+      --text-muted: #a78bfa;
+      --border-soft: rgba(129, 140, 248, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 10% 0%, #1e0935 0, transparent 55%),
+                  radial-gradient(circle at 90% 100%, #0f172a 0, transparent 55%),
+                  var(--bg-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
+      padding: 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: radial-gradient(circle at 20% 0, #1e0b3a 0, var(--bg-card) 55%);
+      border-radius: 24px;
+      padding: 18px 16px 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 0 35px rgba(30, 64, 175, 0.7);
+    }
+
+    .title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      border-radius: 18px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      background: #020617;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .qty-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(129, 140, 248, 0.9);
+      background: #020617;
+      color: var(--accent-2);
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-display {
+      min-width: 24px;
+      text-align: center;
+      font-size: 1.4rem;
+    }
+
+    .btn-main, .btn-secondary {
+      width: 100%;
+      border-radius: 18px;
+      padding: 11px 16px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #22d3ee, #a855ff);
+      color: #020617;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
+    }
+
+    .btn-main:disabled,
+    .btn-secondary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: #020617;
+      color: var(--accent);
+      border: 1px solid rgba(129, 140, 248, 0.9);
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      min-height: 18px;
+      color: var(--text-muted);
+    }
+
+    .status a {
+      color: #bfdbfe;
+      text-decoration: underline;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      border: 1px solid rgba(129, 140, 248, 0.7);
+      box-shadow: 0 0 20px rgba(30, 64, 175, 0.8);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+      z-index: 50;
+    }
+    .toast-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title" id="collectionTitle">SeaDrop Mint</div>
+    <div class="subtitle" id="collectionSubtitle">Loading collection info…</div>
+
+    <div class="pill">
+      <div class="label">Total Supply</div>
+      <div class="value" id="supplyValue">– / –</div>
+    </div>
+
+    <div class="pill">
+      <div class="label">You minted</div>
+      <div class="value" id="youMintedValue">Connect wallet</div>
+    </div>
+
+    <div class="qty-row">
+      <div class="label">Quantity</div>
+      <div class="qty-controls">
+        <button class="qty-btn" id="btnDec">−</button>
+        <div class="qty-display" id="qtyDisplay">1</div>
+        <button class="qty-btn" id="btnInc">+</button>
+      </div>
+    </div>
+
+    <button class="btn-main" id="btnMint">Mint 1 NFT (SeaDrop)</button>
+    <button class="btn-secondary" id="btnConnect">Connect Wallet</button>
+
+    <div class="status" id="statusText"></div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import {
+      createConfig,
+      connect,
+      getAccount,
+      readContract,
+      writeContract,
+      http
+    } from 'https://esm.sh/@wagmi/core';
+    import { base } from 'https://esm.sh/@wagmi/core/chains';
+    import { injected } from 'https://esm.sh/@wagmi/connectors';
+
+    const toastEl = document.getElementById('toast');
+    const titleEl = document.getElementById('collectionTitle');
+    const subtitleEl = document.getElementById('collectionSubtitle');
+    const supplyValueEl = document.getElementById('supplyValue');
+    const youMintedEl = document.getElementById('youMintedValue');
+    const btnConnect = document.getElementById('btnConnect');
+    const btnMint = document.getElementById('btnMint');
+    const btnDec = document.getElementById('btnDec');
+    const btnInc = document.getElementById('btnInc');
+    const qtyDisplay = document.getElementById('qtyDisplay');
+    const statusText = document.getElementById('statusText');
+
+    const config = createConfig({
+      chains: [base],
+      transports: {
+        [base.id]: http()
+      }
+    });
+
+    let CONTRACT = { address: null, abi: null };
+    let userAddress = null;
+    let maxSupply = 0n;
+    let currentSupply = 0n;
+    let maxPerTx = 5; // batas UI saja, SeaDrop limit aslinya di config
+    let qty = 1;
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('toast-show');
+      setTimeout(() => toastEl.classList.remove('toast-show'), 2200);
+    }
+
+    function updateQtyUI() {
+      qtyDisplay.textContent = qty.toString();
+      btnDec.disabled = qty <= 1;
+      btnInc.disabled = qty >= maxPerTx;
+      btnMint.textContent = `Mint ${qty} NFT${qty > 1 ? 's' : ''} (SeaDrop)`;
+    }
+
+    btnDec.addEventListener('click', () => {
+      if (qty > 1) {
+        qty--;
+        updateQtyUI();
+      }
+    });
+
+    btnInc.addEventListener('click', () => {
+      if (qty < maxPerTx) {
+        qty++;
+        updateQtyUI();
+      }
+    });
+
+    async function loadContract() {
+      if (CONTRACT.address) return CONTRACT;
+      try {
+        const json = await fetch('./contract-seadrop.json').then(r => r.json());
+        CONTRACT = json;
+      } catch (e) {
+        console.error('Failed to load contract-seadrop.json', e);
+        showToast('Error loading contract ABI');
+      }
+      return CONTRACT;
+    }
+
+    async function maybeSwitchToBase() {
+      const eth = window.ethereum;
+      if (!eth) return;
+      try {
+        await eth.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x2105' }]
+        });
+      } catch (e) {
+        console.warn('Switch chain error', e);
+      }
+    }
+
+    async function connectWallet() {
+      await maybeSwitchToBase();
+      const connector = injected();
+      const result = await connect(config, { connector });
+      const account = getAccount(config);
+      userAddress = account.address;
+      youMintedEl.textContent = 'Loading…';
+      showToast('Wallet connected');
+      btnConnect.textContent = 'Connected';
+      return result;
+    }
+
+    async function refreshGlobalStats() {
+      try {
+        const { address, abi } = await loadContract();
+        if (!address) return;
+
+        // pakai getMintStats dengan address 0x0 utk baca currentTotalSupply & maxSupply
+        const zero = '0x0000000000000000000000000000000000000000';
+
+        const [name, symbol, stats] = await Promise.all([
+          readContract(config, { address, abi, functionName: 'name' }),
+          readContract(config, { address, abi, functionName: 'symbol' }),
+          readContract(config, {
+            address,
+            abi,
+            functionName: 'getMintStats',
+            args: [zero]
+          })
+        ]);
+
+        const [ , currentTotalSupply, maxSupplyValue ] = stats;
+
+        currentSupply = currentTotalSupply;
+        maxSupply = maxSupplyValue;
+
+        titleEl.textContent = `${name} (${symbol})`;
+        subtitleEl.textContent = 'SeaDrop-enabled collection on Base';
+        supplyValueEl.textContent = `${currentSupply.toString()} / ${maxSupply.toString()}`;
+      } catch (e) {
+        console.warn('refreshGlobalStats error', e);
+        subtitleEl.textContent = 'Failed to load collection info';
+        supplyValueEl.textContent = 'N/A';
+      }
+    }
+
+    async function refreshUserMinted() {
+      if (!userAddress) {
+        youMintedEl.textContent = 'Connect wallet';
+        return;
+      }
+      try {
+        const { address, abi } = await loadContract();
+        const [minterNumMinted] = await readContract(config, {
+          address,
+          abi,
+          functionName: 'getMintStats',
+          args: [userAddress]
+        });
+        youMintedEl.textContent = `${minterNumMinted.toString()} minted`;
+      } catch (e) {
+        console.warn('refreshUserMinted error', e);
+        youMintedEl.textContent = 'N/A';
+      }
+    }
+
+    btnConnect.addEventListener('click', async () => {
+      try {
+        await connectWallet();
+        await refreshUserMinted();
+      } catch (e) {
+        console.warn('Connect failed', e);
+        showToast('Failed to connect wallet');
+      }
+    });
+
+    btnMint.addEventListener('click', async () => {
+      statusText.textContent = '';
+      if (!userAddress) {
+        try {
+          await connectWallet();
+          await refreshUserMinted();
+        } catch (e) {
+          statusText.textContent = 'Connect wallet failed.';
+          return;
+        }
+      }
+
+      btnMint.disabled = true;
+      btnMint.textContent = 'Minting…';
+
+      try {
+        const { address, abi } = await loadContract();
+
+        const txHash = await writeContract(config, {
+          address,
+          abi,
+          functionName: 'mintSeaDrop',
+          args: [userAddress, BigInt(qty)]
+          // SeaDrop handle payment di kontrak SeaDrop, di sini nonpayable
+        });
+
+        statusText.innerHTML =
+          `✅ Mint tx sent. <a href="https://basescan.org/tx/${txHash}" target="_blank">View on BaseScan</a>`;
+        showToast('Mint tx sent');
+
+        await refreshGlobalStats();
+        await refreshUserMinted();
+      } catch (e) {
+        console.warn('Mint error', e);
+        statusText.textContent = '❌ Mint failed or reverted (check SeaDrop config / OnlyAllowedSeaDrop).';
+        showToast('Mint failed');
+      } finally {
+        btnMint.disabled = false;
+        updateQtyUI();
+      }
+    });
+
+    // init
+    (async function init() {
+      updateQtyUI();
+      await refreshGlobalStats();
+    })();
+  </script>
+</body>
+</html>
